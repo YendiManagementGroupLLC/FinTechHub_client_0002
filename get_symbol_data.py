@@ -45,7 +45,7 @@ def add_and_fetch_data():
 	
 
 def json_fix(penny_stock, json_in):
-	print(str(penny_stock) + ' >>> ' + str(json_in))
+	# print(str(penny_stock) + ' >>> ' + str(json_in))
 	from_quote = "'"
 	to_quote = '"'
 	return str(json_in).replace(from_quote, to_quote)
@@ -59,7 +59,7 @@ def datetime_from_long(long_date_string):
 def load_data():
 	print('Starting the load process ...')
 	
-	penny_stocks = ['AAPL','ABIL','RKDA','GEVO','NAKD','CRON','GEVO','EGY','DEST','BLNK','SNES','SNES','DPW','JVA','AVXL','CRON','POTN','KBLB','BLNK']
+	penny_stocks = ['AAPL','ABIL','AVXL','BLNK','CRON','DEST','DPW','EGY','GEVO','JVA','KBLB','NAKD','POTN','RKDA','SNES']
 	
 	client = pymongo.MongoClient(mongo_cxn)
 	db = client.test
