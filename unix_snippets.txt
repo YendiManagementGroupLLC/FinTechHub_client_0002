@@ -1,1 +1,7 @@
+alias l='ls -ltr'
+alias c='clear'
+alias gp='echo `pwd` && git pull && git fetch'
+alias gx='git add . && git commit && git push'
+
 export base_dir=/c/Dev && cd ${base_dir} && for curr_dir in `ls`; do echo "Now working on ${base_dir}/${curr_dir} ..." && cd ${base_dir}/${curr_dir} && git fetch && git pull; done
+
