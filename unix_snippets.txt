@@ -1,0 +1,1 @@
+export base_dir=/c/Dev && cd ${base_dir} && for curr_dir in `ls`; do echo "Now working on ${base_dir}/${curr_dir} ..." && cd ${base_dir}/${curr_dir} && git fetch && git pull; done
