@@ -59,8 +59,8 @@ def datetime_from_long(long_date_string):
 def load_data():
     print('Starting the load process ...')
 
-    penny_stocks = ['AAPL', 'ABIL', 'AVXL', 'BLNK', 'CRON', 'DEST', 'DPW', 'EGY', 'GEVO', 'JVA', 'KBLB', 'NAKD', 'POTN',
-                    'RKDA', 'SNES']
+    penny_stocks = ['AAPL', 'ABIL', 'AVXL', 'BLNK', 'CRON', 'DEST', 'DPW', 'EGY', 'FB', 'GEVO', 'JVA', 'KBLB', 'NAKD',
+                    'POTN', 'RKDA', 'SNES']
 
     client = pymongo.MongoClient(mongo_cxn)
     db = client.test
