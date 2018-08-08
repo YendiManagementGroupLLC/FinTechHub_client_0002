@@ -3,6 +3,8 @@ import json
 import pymongo
 import datetime
 
+import symbol_list as sl
+
 # http://api.mongodb.com/python/current/tutorial.html
 symb_key = '@@SYM@@'
 base_url = 'https://finance.yahoo.com/quote/' + symb_key + '/history?p=' + symb_key
@@ -59,8 +61,7 @@ def datetime_from_long(long_date_string):
 def load_data():
     print('Starting the load process ...')
 
-    penny_stocks = ['AAPL', 'ABIL', 'AVXL', 'BLNK', 'CRON', 'DEST', 'DPW', 'EGY', 'FB', 'GEVO', 'JVA', 'KBLB', 'NAKD',
-                    'POTN', 'RKDA', 'SNES']
+    penny_stocks = sl.all_symbols()
 
     client = pymongo.MongoClient(mongo_cxn)
     db = client.test
