@@ -1,5 +1,5 @@
 def all_symbols():
-    return ['AAPL',
+    return ['NOTASYM', 'AAPL',
             'ABIL',
             'ADM',
             'AES',

@@ -2,6 +2,7 @@ import urllib.request
 import json
 import pymongo
 import datetime
+import sys
 
 import symbol_list as sl
 
@@ -61,19 +62,34 @@ def datetime_from_long(long_date_string):
 def load_data():
     print('Starting the load process ...')
 
-    penny_stocks = sl.all_symbols()
+    all_symbols = sl.all_symbols()
+    skipped_symbols = []
 
     client = pymongo.MongoClient(mongo_cxn)
     db = client.test
 
-    for penny_stock in penny_stocks:
+    for curr_symbol in all_symbols:
         result_messages = ''
-        prices = get_historical_price_store(penny_stock)
-        collection = db[penny_stock]
+        prices = None
+        for retry_count in range(1, 4):
+            try:
+                prices = get_historical_price_store(curr_symbol)
+                break
+            except Exception as error:
+                print(error)
+                print(sys.exc_info()[0])
+                message = str(retry_count) + ' FETCH ATTEMPT ERROR for ' + str(curr_symbol)
+                print(message)
+        if prices is None:
+            skipped_symbols.append(curr_symbol)
+            message = 'Skipping processing for ' + str(curr_symbol)
+            print(message)
+            continue
+        collection = db[curr_symbol]
         previous_count = collection.count_documents({})
         incoming_count = len(prices)
         for price in prices:
-            price_string = json_fix(penny_stock, price)
+            price_string = json_fix(curr_symbol, price)
             price_details = json.loads(price_string)
             date_key = price_details['date']
             search_arg = {'date': date_key}
@@ -84,27 +100,33 @@ def load_data():
                 match_index += 1
                 match_messages += str(match_index) + '=>' + str(match) + ';'
             if match_index == 0:
-                message = str(penny_stock) + ' No matches for [' + str(datetime_from_long(date_key)) + '] ' + str(
+                message = str(curr_symbol) + ' No matches for [' + str(datetime_from_long(date_key)) + '] ' + str(
                     search_arg)
                 print(message)
             if match_index > 1:
-                message = str(penny_stock) + ' Multiple matches for [' + str(datetime_from_long(date_key)) + '] ' + str(
+                message = str(curr_symbol) + ' Multiple matches for [' + str(datetime_from_long(date_key)) + '] ' + str(
                     search_arg) + ' => ' + str(match_messages)
                 print(message)
             result = collection.replace_one(search_arg, price, upsert=True)
             if match_index != 1:
-                result_messages += str(penny_stock) + ' DATE: ' + str(datetime_from_long(date_key)) + ' [' + str(
+                result_messages += str(curr_symbol) + ' DATE: ' + str(datetime_from_long(date_key)) + ' [' + str(
                     date_key) + '] result=' + str(result.raw_result) + '\n'
 
         current_count = collection.count_documents({})
         if incoming_count != current_count:
-            message = str(penny_stock) + ' STATS: incoming_count=' + str(incoming_count) + '; previous_count=' + str(
+            message = str(curr_symbol) + ' STATS: incoming_count=' + str(incoming_count) + '; previous_count=' + str(
                 previous_count) + '; current_count=' + str(current_count)
             print(message)
             if len(result_messages) > 0:
                 print(result_messages)
 
     client.close()
+
+    if len(skipped_symbols) > 0:
+        all_skipped_symbols = '; '.join(skipped_symbols)
+        message = 'All skipped symbols => ' + str(all_skipped_symbols)
+        print(message)
+
     print('All done!')
 
 
